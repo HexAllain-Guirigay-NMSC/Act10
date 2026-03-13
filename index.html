@@ -6,7 +6,6 @@
 <title>Standard Calculator</title>
 
 <style>
-
 body{
     font-family: Arial, Helvetica, sans-serif;
     background:#f4f4f4;
@@ -89,7 +88,6 @@ button:hover{
     font-size:13px;
     color:#666;
 }
-
 </style>
 </head>
 <body>
@@ -139,7 +137,6 @@ button:hover{
 </div>
 
 <script>
-
 let display = document.getElementById("display");
 let preview = document.getElementById("preview");
 let info = document.getElementById("info");
@@ -163,7 +160,7 @@ function appendNumber(num){
     }
 
     if(firstValue !== null && operator !== null){
-        preview.textContent = firstValue + " " + operator;
+        preview.textContent = formatNumber(firstValue) + " " + operator;
     }
 }
 
@@ -210,6 +207,7 @@ function operate(a, b, op){
 }
 
 function formatNumber(num){
+    if(!isFinite(num)) return "0";
     if(Number.isInteger(num)){
         return num.toString();
     }
@@ -226,6 +224,16 @@ function clearAll(){
     info.innerHTML = "";
 }
 
+function backspace(){
+    if(waitingForSecond || justCalculated) return;
+
+    if(display.value.length > 1){
+        display.value = display.value.slice(0, -1);
+    }else{
+        display.value = "0";
+    }
+}
+
 function showDeveloper(){
     info.innerHTML =
         "<b>Developer:</b> Hex Allain J. Guirigay<br>" +
@@ -240,6 +248,52 @@ function showApp(){
         "This calculator performs basic arithmetic operations just like the Windows OS standard calculator.";
 }
 
+/* Keyboard support */
+document.addEventListener("keydown", function(e){
+    const key = e.key;
+
+    if(key >= "0" && key <= "9"){
+        appendNumber(key);
+        e.preventDefault();
+        return;
+    }
+
+    if(key === "+" || key === "-" || key === "*" || key === "/"){
+        setOperator(key);
+        e.preventDefault();
+        return;
+    }
+
+    if(key === "Enter" || key === "="){
+        calculate();
+        e.preventDefault();
+        return;
+    }
+
+    if(key === "Backspace"){
+        backspace();
+        e.preventDefault();
+        return;
+    }
+
+    if(key === "Escape" || key === "Delete"){
+        clearAll();
+        e.preventDefault();
+        return;
+    }
+
+    if(key === "a" || key === "A"){
+        showDeveloper();
+        e.preventDefault();
+        return;
+    }
+
+    if(key === "b" || key === "B"){
+        showApp();
+        e.preventDefault();
+        return;
+    }
+});
 </script>
 
 </body>
